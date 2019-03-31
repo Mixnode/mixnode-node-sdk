@@ -11,7 +11,7 @@ The Mixnode [Node.js](https://nodejs.org/) SDK allows you to easily integrate th
 
 ### Installation
 ```sh
-npm install mixnode-js-sdk --save
+npm install mixnode-node-sdk --save
 ```
 
 ## Tutorial
@@ -31,7 +31,7 @@ This SDK comes with basic authentication over HTTPS which requires you to pass y
 This type of token is given directly to the application.
 
 ``` JavaScript
-var Mixnode = require('mixnode-js-sdk');
+var Mixnode = require('mixnode-node-sdk');
 
 // Create an instance of the Mixnode SQL Client
 const SQLClient = new Mixnode.SQLClient({
@@ -39,7 +39,7 @@ const SQLClient = new Mixnode.SQLClient({
 });
 ```
 Note that `api_key` can also be passed as a JSON object in a config file to avoid specifying the key in the code.
-Please see [Sample App](https://github.com/Mixnode/mixnode-js-sdk/blob/master/examples/sampleApp1.js)
+Please see [Examples](https://github.com/Mixnode/mixnode-node-sdk/blob/master/examples)
 
 #### Quick Start
 
@@ -50,8 +50,8 @@ const config = require('./config.js');
 
 const SQLClient = new Mixnode.SQLClient(config);
 
-// Gets 10 urls and their title from pages table
-SQLClient.execute('SELECT url, title from pages LIMIT 10')
+// Gets 10 urls and their title from homepages table
+SQLClient.execute('SELECT url, title from homepages LIMIT 10')
 .then((response) => {
 	console.log(response);
 }).catch((err) => {
@@ -63,7 +63,7 @@ SQLClient.execute('SELECT url, title from pages LIMIT 10')
 #### SQLClient's execute functionality
 `SQLClient.execute` is an asynchronous operation which returns a `promise` object either resolving as a response or error which could then be obtained using `then` or `catch` statements. 
 
-##### Different ways of using SQLClient.execute
+##### SQLClient.execute can accept upto four parameters : query, vars (optional), inputLimit (optional), timeout (optional). Please see various [Examples](https://github.com/Mixnode/mixnode-node-sdk/blob/master/examples) for usage details.
 ```JavaScript
 SQLClient.execute(query).then((response) => {
 	// Do somethere here with the response
@@ -130,8 +130,8 @@ SQLClient.execute(query).then((response) => {
 * `error.stack` => Stack trace of the error
 
 
-## Sample Apps built on top of Mixnode SQL Client
-[sample apps](https://github.com/Mixnode/mixnode-js-sdk/tree/master/examples)
+## Examples: Mixnode SQL Client
+[sample examples](https://github.com/Mixnode/mixnode-node-sdk/tree/master/examples)
 
 ## SQL API Documentation
 
