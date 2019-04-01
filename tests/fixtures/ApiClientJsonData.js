@@ -2,7 +2,7 @@ module.exports = {
   dummyQueryObject: {
     object: 'query',
     query_id: '83a423e7c7588e5e6a',
-    query_str: "SELECT url from pages LIMIT 5",
+    query_str: 'SELECT url from pages LIMIT 5',
     status: 'PLANNING',
     error_msg: null,
     created_ts: 1551497624,

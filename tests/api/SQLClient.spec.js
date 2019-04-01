@@ -4,7 +4,7 @@ const Mixnode = require('./../../src/index');
 const config = require('./../test.config.js');
 const MixnodeData = require('./../assets/MixnodeData.json');
 
-const query = "SELECT * from pages LIMIT 5";
+const query = 'SELECT * from homepages LIMIT 5';
 
 describe('Functions are defined', () => {
     let SQLClient;
@@ -45,8 +45,8 @@ describe('Functions are defined', () => {
       spyOn(SQLClient.apiClient, 'callApi').and.returnValue(Promise.resolve(MixnodeData));
       const columns = ['url', 'url_domain'];
       const query = 'SELECT ?? from ?? where ?? = ? LIMIT 10';
-      const vars = [columns, 'pages', 'url_domain', 'cnn.com'];
-      const formattedQuery = 'SELECT "url", "url_domain" from "pages" where "url_domain" = \'cnn.com\' LIMIT 10';
+      const vars = [columns, 'homepages', 'url_domain', 'cnn.com'];
+      const formattedQuery = 'SELECT "url", "url_domain" from "homepages" where "url_domain" = \'cnn.com\' LIMIT 10';
       SQLClient.execute(query, vars)
       .then((resp) => {
         expect(SQLClient.apiClient.callApi).toHaveBeenCalledWith('/queries', 'POST',
@@ -62,8 +62,8 @@ describe('Functions are defined', () => {
              + "and contains_any(content, array['href=\"https://www.bbc.com']) "
              + 'LIMIT 10';
 
-      const vars = ['content', 'url', 'pages', 'url_domain', 'wikipedia.org'];
-      const formattedQuery = 'SELECT css_text_first("content", \'h1#firstHeading\') as title, "url" from "pages" where "url_domain" = \'wikipedia.org\'  and contains_any(content, array[\'href="https://www.bbc.com\']) LIMIT 10';
+      const vars = ['content', 'url', 'homepages', 'url_domain', 'wikipedia.org'];
+      const formattedQuery = 'SELECT css_text_first("content", \'h1#firstHeading\') as title, "url" from "homepages" where "url_domain" = \'wikipedia.org\'  and contains_any(content, array[\'href="https://www.bbc.com\']) LIMIT 10';
       SQLClient.execute(query, vars)
       .then((resp) => {
         expect(SQLClient.apiClient.callApi).toHaveBeenCalledWith('/queries', 'POST',
@@ -121,9 +121,9 @@ describe('Functions are defined', () => {
       spyOn(SQLClient.apiClient, 'callApi').and.returnValue(Promise.resolve(MixnodeData));
       const columns = ['url', 'url_domain'];
       const query = 'SELECT ?? from ?? where ?? = ? LIMIT 10';
-      const vars = [columns, 'pages', 'url_domain', 'cnn.com'];
+      const vars = [columns, 'homepages', 'url_domain', 'cnn.com'];
       const oOptions = { timeout: 100000 };
-      const formattedQuery = 'SELECT "url", "url_domain" from "pages" where "url_domain" = \'cnn.com\' LIMIT 10';
+      const formattedQuery = 'SELECT "url", "url_domain" from "homepages" where "url_domain" = \'cnn.com\' LIMIT 10';
       SQLClient.execute(query, vars, oOptions)
       .then((resp) => {
         expect(SQLClient.apiClient.callApi).toHaveBeenCalledWith('/queries', 'POST',
@@ -137,9 +137,9 @@ describe('Functions are defined', () => {
       const columns = ['url', 'url_domain'];
       const inputLimit = 123123123 * 12;
       const query = 'SELECT ?? from ?? where ?? = ? LIMIT 10';
-      const vars = [columns, 'pages', 'url_domain', 'cnn.com'];
+      const vars = [columns, 'homepages', 'url_domain', 'cnn.com'];
       const oOptions = { timeout: 100000 };
-      const formattedQuery = 'SELECT "url", "url_domain" from "pages" where "url_domain" = \'cnn.com\' LIMIT 10';
+      const formattedQuery = 'SELECT "url", "url_domain" from "homepages" where "url_domain" = \'cnn.com\' LIMIT 10';
       SQLClient.execute(query, vars, inputLimit, oOptions)
       .then((resp) => {
         expect(SQLClient.apiClient.callApi).toHaveBeenCalledWith('/queries', 'POST',

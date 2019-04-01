@@ -4,14 +4,50 @@ module.exports = (function () {
   const error = require('./utils/Error');
   const errorUtils = require('./utils/ErrorUtils');
 
+  /**
+   * @module ApiClient
+   */
+
+  /**
+   * Manages low level client-server communications. There should not be any need for an
+   * application to use this class directly - the *Api classes provide the public API for the service. The
+   * contents of this file should be regarded as internal but are documented for completeness.
+   * @alias module:ApiClient
+   * @class
+   */
   const exports = function () {
+    /**
+     * The base URL against which to resolve every API call's (relative) path.
+     * @type {String}
+     * @default https://api.mixnode.com
+     */
     this.basePath = 'https://api.mixnode.com'.replace(/\/+$/, '');
+    /**
+     * The default HTTP headers to be included for all API calls.
+     * @type {Array.<String>}
+     * @default {}
+     */
     this.defaultHeaders = {};
+    /**
+     * The default HTTP timeout for all API calls.
+     * @type {Number}
+     * @default 60000
+     */
     this.timeout = null;
+    /**
+     * Response built from API calls.
+     * @type {Array.<String>}
+     * @default []
+     */
     this.response = [];
+
+    /* Mixnode credential placeholder */
     this.credentials = null;
-    this.lag = 2000; // in ms
+    /* Delay in sending subsequent requests in milliseconds */
+    this.lag = 2000;
+    /* Query id for the query sent */
     this.query_id = null;
+    /* placeholder for implementing timeout */
     this.start = null;
   };
 
@@ -19,6 +55,11 @@ module.exports = (function () {
     this.response = null;
   };
 
+  /**
+   * Returns a string representation for an actual parameter.
+   * @param param The actual parameter.
+   * @returns {String} The string representation of <code>param</code>.
+   */
   exports.prototype.paramToString = function (param) {
     if (param === undefined || param === null) {
       return '';
@@ -29,6 +70,13 @@ module.exports = (function () {
     return param.toString();
   };
 
+  /**
+   * Builds full URL by appending the given path to the base URL and replacing path parameter place-holders with parameter values.
+   * NOTE: query parameters are not handled here.
+   * @param {String} path The path to append to the base URL.
+   * @param {Object} pathParams The parameter values to append.
+   * @returns {String} The encoded path with parameter values substituted.
+   */
   exports.prototype.buildUrl = function (path, pathParams) {
     if (!path.match(/^\//)) {
       path = `/${path}`;
@@ -47,10 +95,26 @@ module.exports = (function () {
     return url;
   };
 
+  /**
+   * Checks whether the given content type represents JSON.<br>
+   * JSON content type examples:<br>
+   * <ul>
+   * <li>application/json</li>
+   * <li>application/json; charset=UTF8</li>
+   * <li>APPLICATION/JSON</li>
+   * </ul>
+   * @param {String} contentType The MIME content type to check.
+   * @returns {Boolean} <code>true</code> if <code>contentType</code> represents JSON, otherwise <code>false</code>.
+   */
   exports.prototype.isJsonMime = function (contentType) {
     return Boolean(contentType !== undefined && contentType !== null && contentType.match(/^application\/(vnd.api\+)?json(;.*)?$/i));
   };
 
+  /**
+   * Chooses a content type from the given array, with JSON preferred; i.e. return JSON if included, otherwise return the first.
+   * @param {Array.<String>} contentTypes
+   * @returns {String} The chosen content type, preferring JSON.
+   */
   exports.prototype.jsonPreferredMime = function (contentTypes) {
     for (let i = 0; i < contentTypes.length; i++) {
       if (this.isJsonMime(contentTypes[i])) {
@@ -60,10 +124,25 @@ module.exports = (function () {
     return contentTypes[0];
   };
 
+  /**
+   * Checks whether the given parameter value represents file-like content.
+   * @param param The parameter to check.
+   * @returns {Boolean} <code>true</code> if <code>param</code> represents a file.
+   */
   exports.prototype.isFileParam = function (param) {
     return param instanceof require('fs').ReadStream || (typeof Buffer === 'function' && param instanceof Buffer);
   };
 
+  /**
+   * Normalizes parameter values:
+   * <ul>
+   * <li>remove nils</li>
+   * <li>keep files and arrays</li>
+   * <li>format to string with `paramToString` for other cases</li>
+   * </ul>
+   * @param {Object.<String, Object>} params The parameters as object properties.
+   * @returns {Object.<String, Object>} normalized parameters.
+   */
   exports.prototype.normalizeParams = function (params) {
     const newParams = {};
     for (const key in params) {
@@ -79,6 +158,10 @@ module.exports = (function () {
     return newParams;
   };
 
+  /**
+   * Enable working in debug mode
+   * To activate, simple set Mixnode.setDebug(true);
+   */
   exports.prototype.debug = function debug() {
     if (this.isDebugMode) {
       const args = Array.prototype.slice.call(arguments);
@@ -92,6 +175,8 @@ module.exports = (function () {
     }
   };
 
+  /* Builds Mixnode raw response to array of objects where objects are
+  based on columns of the tables requested via query */
   const _buildRecords = function (rawResponse) {
     const records = [];
     (rawResponse.rows || []).forEach((row) => {
@@ -104,8 +189,10 @@ module.exports = (function () {
     return records;
   };
 
+  /* promise instance to delay the subsequent requests */
   const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
 
+  /* Async function to make API calls using npm request-promise library */
   exports.prototype.__request = async function __request(requestParams) {
     const _this = this;
     let payload;
@@ -127,6 +214,11 @@ module.exports = (function () {
     }
   };
 
+  /* Function to handle as below:
+  1. timeout if supplied by the user wants to cancel the query after certain period of time
+  2. handles paging response from Mixnode server.
+    Find more about it here https://www.mixnode.com/docs/sql-api/queries
+  */
   exports.prototype._request = async function _request(requestParams) {
     const _this = this;
     const current = Date.now();
@@ -147,21 +239,35 @@ module.exports = (function () {
       }
         throw new error.QueryTimeout();
     }
+    // Fires first POST request with parameters
     const fragment = await _this.__request(requestParams);
+
+    // First POST request should give back query id
     if (fragment.query_id) {
       _this.query_id = fragment.query_id;
+      // Once we have the query id, fire page 1 GET request
       const queryPath = `/queries/${fragment.query_id}/results/1`;
       requestParams = _this._buildRequestParams(queryPath, 'GET');
       return _this._request(requestParams);
-    } if (fragment.next_page) {
+    }
+    /* Subsequent requests should have next_page attribute along with the paging
+    information to make subsequent calls.
+    */
+    if (fragment.next_page) {
       let nextPageUrl = decodeURI(fragment.next_page);
       nextPageUrl = nextPageUrl.slice(_this.basePath.length + 1);
       requestParams = _this._buildRequestParams(nextPageUrl, 'GET');
       return _this._request(requestParams);
     }
-      return _this.response;
+    /* returns the built response once the next_page attribute is
+    not a part of response from previous requests
+    */
+    return _this.response;
   };
 
+  /* Function to build request parameters
+  Accepts query path concatenating to base path, http method and body if POST request.
+  */
   exports.prototype._buildRequestParams = function _buildRequestParams(path, httpMethod, formParams) {
     const requestParams = {};
     const contentTypes = ['application/json'];
@@ -185,6 +291,15 @@ module.exports = (function () {
     return requestParams;
   };
 
+  /**
+   * Invokes the REST service using the supplied settings and parameters.
+   * @param {String} path The base URL to invoke.
+   * @param {String} httpMethod The HTTP method to use.
+   * @param {Object.<String, Object>} formParams A map of form parameters and their values.
+   * @param {Object} credentials has the API key to Mixnode server.
+   * @param {Object} oOptions optional parameter for the call.
+   * @returns {Object} A Promise object.
+   */
   exports.prototype.callApi = async function callApi(path, httpMethod, formParams, credentials, oOptions) {
     const _this = this;
     _this.credentials = credentials;

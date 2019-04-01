@@ -7,7 +7,7 @@ const config = require('./config.js');
 
 //* ********* Arguments section *******************************/
 // sample query to get the data from Mixnode
-const query = "SELECT url from homepages LIMIT 10";
+const query = 'SELECT url from homepages LIMIT 10';
 // vars is the list of options to replace in the query
 const vars = [];
 /** ********************************************************** */
@@ -18,7 +18,7 @@ const runSQLQueries = function (query, oOptions) {
 	console.log('***** Running SQL on Mixnode *****');
 	return SQLClient.execute(query, oOptions);
 };
- 
+
 runSQLQueries(query, 10737418242323).then((response) => {
 	console.log(response);
 }).catch((err) => {

@@ -32,6 +32,7 @@ APIError._buildError = function _buildError(status, errorMsg) {
   return oError;
 };
 
+/* Builds error message if status is one of statuses with errors */
 APIError.getError = function getError(status, errorMsg) {
   const hasError = !!QUERY_ERROR_STATUS[status];
   if (hasError) {

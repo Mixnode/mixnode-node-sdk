@@ -24,7 +24,7 @@
   },
   "keywords": [
     "Mixnode",
-    "mixnode-js-sdk"
+    "mixnode-node-sdk"
   ],
   "devDependencies": {
     "eslint": "^5.12.1",

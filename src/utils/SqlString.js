@@ -1,3 +1,5 @@
+/* From https://www.npmjs.com/package/sqlstring */
+
 const SqlString = exports;
 
 const ID_GLOBAL_REGEXP = /"/g;
