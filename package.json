@@ -1,13 +1,16 @@
 {
   "name": "mixnode",
-  "version": "1.0.0",
+  "version": "0.0.0-development",
   "description": "Mixnode Node.js SDK",
   "main": "src/index.js",
   "scripts": {
+    "commit": "git-cz",
     "test": "jasmine \"**/*.spec.js\"",
-    "coverage": "istanbul cover _mocha -- --recursive",
+    "coverage": "jest --config jest.json --coverage",
     "lint": "eslint \"**/*.js\"",
-    "lint-fix": "eslint --fix \"**/*.js\""
+    "lint-fix": "eslint --fix \"**/*.js\"",
+    "semantic-release": "semantic-release",
+    "travis-deploy-once": "travis-deploy-once"
   },
   "repository": {
     "type": "git",
@@ -16,7 +19,7 @@
   "bugs": {
     "url": "https://github.com/Mixnode/mixnode-node-sdk/issues"
   },
-  "private": true,
+  "license": "Apache-2.0",
   "dependencies": {
     "request": "^2.87.0",
     "request-promise": "^4.2.2",
@@ -27,6 +30,8 @@
     "mixnode-node-sdk"
   ],
   "devDependencies": {
+    "commitizen": "3.0.7",
+    "cz-conventional-changelog": "2.1.0",
     "eslint": "^5.12.1",
     "eslint-config-airbnb-base": "^13.1.0",
     "eslint-plugin-chai-friendly": "^0.4.1",
@@ -34,6 +39,14 @@
     "eslint-plugin-react": "^7.12.4",
     "jasmine": "^2.6.0",
     "mocha": "^5.2.0",
-    "nock": "^10.0.6"
+    "nock": "^10.0.6",
+    "jest": "24.7.1",
+    "semantic-release": "^15.13.3",
+    "travis-deploy-once": "5.0.11"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
   }
 }
