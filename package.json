@@ -1,6 +1,6 @@
 {
   "name": "mixnode-node-sdk",
-  "version": "0.0.1",
+  "version": "1.0.0-beta",
   "description": "Mixnode Node.js SDK",
   "main": "src/index.js",
   "scripts": {
