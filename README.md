@@ -131,7 +131,7 @@ SQLClient.execute(query).then((response) => {
 
 
 ## Examples: Mixnode SQL Client
-[sample examples](https://github.com/Mixnode/mixnode-node-sdk/tree/master/examples)
+[Examples](https://github.com/Mixnode/mixnode-node-sdk/tree/master/examples)
 
 ## SQL API Documentation
 
